@@ -10,7 +10,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 # Создаем движок базы данных
-SQLALCHEMY_DATABASE_URL = "sqlite:///./categories.db"
+SQLALCHEMY_DATABASE_URL = "postgresql://secUREusER:StrongEnoughPassword)@51.250.26.59:5432/query"
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 # Создаем фабрику сессий
@@ -22,7 +22,7 @@ Base = declarative_base()
 
 # Определяем модель Category для SQLAlchemy
 class Category(Base):
-    __tablename__ = "categories"
+    __tablename__ = "categories_kalugin"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
 

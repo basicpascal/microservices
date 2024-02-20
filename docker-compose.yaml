@@ -5,10 +5,10 @@ services:
     container_name: notes
     build: ./notes
     ports:
-      - "8000:8000"
+      - "8080:80"
 
   categories:
     container_name: categories
     build: ./categories
     ports:
-      - "8001:8001"
+      - "8081:80"

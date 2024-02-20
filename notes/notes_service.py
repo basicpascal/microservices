@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from typing import List
 
 # Создаем движок базы данных
-SQLALCHEMY_DATABASE_URL = "sqlite:///./notes.db"
+SQLALCHEMY_DATABASE_URL = "postgresql://secUREusER:StrongEnoughPassword)@51.250.26.59:5432/query"
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 # Создаем фабрику сессий
@@ -22,7 +22,7 @@ Base = declarative_base()
 
 # Определяем модель Note для SQLAlchemy
 class NoteDB(Base):
-    __tablename__ = "notes"
+    __tablename__ = "notes_kalugin"
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
     content = Column(String)
