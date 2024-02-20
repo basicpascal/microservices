@@ -49,7 +49,7 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          cd notes_service && docker build -f Dockerfile . --tag cr.yandex/${{ secrets.YC_REGISTRY_ID }}/ms-notes-services:latest --platform=linux/amd64
+          cd notes && docker build -f Dockerfile . --tag cr.yandex/${{ secrets.YC_REGISTRY_ID }}/ms-notes-services:latest --platform=linux/amd64
 
       - name: Login to Yandex Cloud
         uses: docker/login-action@v3.0.0
@@ -88,7 +88,7 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          cd categories_service && docker build -f Dockerfile . -t ${{ secrets.DOCKER_USERNAME }}/ms-categories-services:latest 
+          cd categories && docker build -f Dockerfile . -t ${{ secrets.DOCKER_USERNAME }}/ms-categories-services:latest 
 
       - name: Login to DockerHub
         uses: docker/login-action@v3.0.0
