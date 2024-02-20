@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  notes:
+    container_name: notes
+    build: ./notes
+    ports:
+      - "8000:8000"
+
+  categories:
+    container_name: categories
+    build: ./categories
+    ports:
+      - "8001:8001"
