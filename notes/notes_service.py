@@ -50,12 +50,6 @@ def get_db():
         db.close()
 
 
-# Корневой маршрут
-@app.get("/")
-async def root():
-    return {"message": "Hello, World!"}
-
-
 # Вложенная функция для обработки данных
 def process_data(data):
     # Логика обработки данных
@@ -88,6 +82,17 @@ async def read_note(note_id: int, db: Session = Depends(get_db)):
     if note is None:
         raise HTTPException(status_code=404, detail="Note not found")
     return note
+
+
+# Маршрут для удаления записи
+@app.delete("/notes/{note_id}")
+async def delete_note(note_id: int, db: Session = Depends(get_db)):
+    note = db.query(NoteDB).filter(NoteDB.id == note_id).first()
+    if note is None:
+        raise HTTPException(status_code=404, detail="Note not found")
+    db.delete(note)
+    db.commit()
+    return {"message": "Note deleted successfully"}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv('PORT', 80)))
