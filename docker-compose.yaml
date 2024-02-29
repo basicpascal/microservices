@@ -6,9 +6,31 @@ services:
     build: ./notes
     ports:
       - "8080:80"
+    networks:
+      - app-network
 
   categories:
     container_name: categories
     build: ./categories
     ports:
       - "8081:80"
+    networks:
+      - app-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.6
+    ports:
+      - "8180:80"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: 12345
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
+    container_name: keycloak
+    networks:
+      - app-network
+    command: -v start-dev --import-realm
+
+networks:
+  app-network:
+    driver: bridge
