@@ -1,5 +1,4 @@
 import os
-
 import uvicorn
 from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.orm import Session
@@ -49,14 +48,8 @@ def get_db():
         db.close()
 
 
-# Корневой маршрут
-@app.get("/")
-async def root():
-    return {"message": "Hello, World!"}
-
-
 # Маршрут для создания записи
-@app.post("/", response_model=CategoryModel)
+@app.post("/categories/", response_model=CategoryModel)
 async def create_category(category: CategoryModel, db: Session = Depends(get_db)):
     db_category = Category(**category.dict())
     db.add(db_category)
@@ -66,18 +59,30 @@ async def create_category(category: CategoryModel, db: Session = Depends(get_db)
 
 
 # Маршрут для чтения всех записей
-@app.get("/", response_model=List[CategoryModel])
+@app.get("/categories/", response_model=List[CategoryModel])
 async def read_categories(db: Session = Depends(get_db)):
     return db.query(Category).all()
 
 
 # Маршрут для чтения одной записи
-@app.get("/{category_id}", response_model=CategoryModel)
+@app.get("/categories/{category_id}", response_model=CategoryModel)
 async def read_category(category_id: int, db: Session = Depends(get_db)):
     category = db.query(Category).filter(Category.id == category_id).first()
     if category is None:
         raise HTTPException(status_code=404, detail="Category not found")
     return category
+
+
+# Маршрут для удаления записи
+@app.delete("/categories/{category_id}")
+async def delete_category(category_id: int, db: Session = Depends(get_db)):
+    category = db.query(Category).filter(Category.id == category_id).first()
+    if category is None:
+        raise HTTPException(status_code=404, detail="Category not found")
+    db.delete(category)
+    db.commit()
+    return {"message": "Category deleted successfully"}
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv('PORT', 80)))
