@@ -1,5 +1,4 @@
 import os
-
 import uvicorn
 from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.orm import Session
@@ -57,10 +56,19 @@ async def root():
     return {"message": "Hello, World!"}
 
 
+# Вложенная функция для обработки данных
+def process_data(data):
+    # Логика обработки данных
+    processed_data = data.upper()
+    return processed_data
+
+
 # Маршрут для создания записи
 @app.post("/notes/", response_model=Note)
 async def create_note(note: Note, db: Session = Depends(get_db)):
-    db_note = NoteDB(**note.dict())
+    # Вызов вложенной функции для обработки данных
+    processed_content = process_data(note.content)
+    db_note = NoteDB(title=note.title, content=processed_content)
     db.add(db_note)
     db.commit()
     db.refresh(db_note)
