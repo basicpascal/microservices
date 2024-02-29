@@ -9,6 +9,7 @@ from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
+from prometheus_fastapi_instrumentator import Instrumentator
 
 # Создаем движок базы данных
 SQLALCHEMY_DATABASE_URL = "postgresql://secUREusER:StrongEnoughPassword)@51.250.26.59:5432/query"
@@ -48,6 +49,7 @@ keycloak_openid = KeycloakOpenID(server_url=KEYCLOAK_URL,
 
 user_token = ""
 
+Instrumentator().instrument(app).expose(app)
 
 @app.post("/get-token")
 async def get_token(username: str = Form(...), password: str = Form(...)):
