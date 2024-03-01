@@ -29,7 +29,7 @@ services:
     container_name: keycloak
     networks:
       - app-network
-    command: -v start-dev --import-realm
+    command: -v start-dev
 
   loki:
     image: grafana/loki:latest

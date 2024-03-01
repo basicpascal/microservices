@@ -40,7 +40,7 @@ app = FastAPI()
 KEYCLOAK_URL = "http://localhost:8180/"
 KEYCLOAK_CLIENT_ID = "kalugin"
 KEYCLOAK_REALM = "notes_service_realm"
-KEYCLOAK_CLIENT_SECRET = "HucFC1ahAQZllUcijp0X5WPlV0c7wWlm"
+KEYCLOAK_CLIENT_SECRET = "pp2HNzhMUxP0q1r627Kun5TbwWEjNW60"
 
 keycloak_openid = KeycloakOpenID(server_url=KEYCLOAK_URL,
                                  client_id=KEYCLOAK_CLIENT_ID,
@@ -71,7 +71,6 @@ def check_user_roles():
     token = user_token
     try:
         #userinfo = keycloak_openid.userinfo(token["access_token"])
-        token = keycloak_openid.token("test", "1")
         token_info = keycloak_openid.introspect(token["access_token"])
         if "testRole" not in token_info["realm_access"]["roles"]:
             raise HTTPException(status_code=403, detail="Access denied")
@@ -128,11 +127,10 @@ async def read_notes(db: Session = Depends(get_db)):
 # Маршрут для чтения одной записи
 @app.get("/notes/{note_id}", response_model=Note)
 async def read_note(note_id: int, db: Session = Depends(get_db)):
-    if check_user_roles():
-        note = db.query(NoteDB).filter(NoteDB.id == note_id).first()
-        if note is None:
-            raise HTTPException(status_code=404, detail="Note not found")
-        return note
+    note = db.query(NoteDB).filter(NoteDB.id == note_id).first()
+    if note is None:
+        raise HTTPException(status_code=404, detail="Note not found")
+    return note
 
 
 # Маршрут для удаления записи
