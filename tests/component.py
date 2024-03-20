@@ -1,5 +1,6 @@
 import requests
 import unittest
+import json
 
 notes_url = 'http://localhost:8080'
 categories_url = 'http://localhost:8081'
@@ -7,17 +8,15 @@ add_note_url = f'{notes_url}/notes'
 get_note_by_id_url = f'{notes_url}/notes'
 get_notes_url = f'{notes_url}/notes'
 
-note = {
-    "id": 88,
-    "title": "To-Do list",
-    "content": "Write code",
-}
-
 
 class TestIntegration(unittest.TestCase):
-    # CMD: python tests/integration.py
 
     def add_note(self):
+        note = {
+            "id": 88,
+            "title": "To-Do list",
+            "content": "Write code",
+        }
         res = requests.post(add_note_url, json=note)
         self.assertEqual(res, "Success")
 

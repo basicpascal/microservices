@@ -127,10 +127,11 @@ async def read_notes(db: Session = Depends(get_db)):
 # Маршрут для чтения одной записи
 @app.get("/notes/{note_id}", response_model=Note)
 async def read_note(note_id: int, db: Session = Depends(get_db)):
-    note = db.query(NoteDB).filter(NoteDB.id == note_id).first()
-    if note is None:
-        raise HTTPException(status_code=404, detail="Note not found")
-    return note
+    if check_user_roles():
+        note = db.query(NoteDB).filter(NoteDB.id == note_id).first()
+        if note is None:
+            raise HTTPException(status_code=404, detail="Note not found")
+        return note
 
 
 # Маршрут для удаления записи

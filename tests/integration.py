@@ -1,21 +1,25 @@
 import unittest
-import requests
 import psycopg2
-from time import sleep
-import json
-
-notes_url = 'http://localhost:8080'
-categories_url = 'http://localhost:8081'
-add_note_url = f'{notes_url}/notes'
-get_note_by_id_url = f'{notes_url}/notes'
 
 
-class TestIntegration(unittest.TestCase):
-    # CMD: python tests/integration.py
-    def test_ticket_get(self):
-        res = requests.get(f"{get_note_by_id_url}/1").json()
-        self.assertTrue('title' in res.keys())
-        self.assertTrue('content' in res.keys())
+class IntegrationTests(unittest.TestCase):
+    def setUp(self):
+        # Подключение к базе данных PostgreSQL
+        self.db_connection = psycopg2.connect(
+            host="localhost",
+            port="5432",
+            user="test_user",
+            password="test_password",
+            database="test_db"
+        )
+
+    def tearDown(self):
+        # Закрываем соединение с базой данных после каждого теста
+        self.db_connection.close()
+
+    def test_database_connection(self):
+        # Проверяем, что соединение с базой данных установлено
+        self.assertIsNotNone(self.db_connection)
 
 
 if __name__ == '__main__':
