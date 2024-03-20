@@ -9,7 +9,7 @@ get_note_by_id_url = f'{notes_url}/notes'
 get_notes_url = f'{notes_url}/notes'
 
 
-class TestIntegration(unittest.TestCase):
+class TestComponent(unittest.TestCase):
 
     def add_note(self):
         note = {
