@@ -2,7 +2,7 @@ import os
 from typing import List
 
 import uvicorn
-from fastapi import FastAPI, HTTPException, Depends, Form
+from fastapi import FastAPI, HTTPException, Depends, Form, Header
 from keycloak.keycloak_openid import KeycloakOpenID
 from pydantic import BaseModel
 from sqlalchemy import create_engine, Column, Integer, String
@@ -40,7 +40,7 @@ app = FastAPI()
 KEYCLOAK_URL = "http://localhost:8180/"
 KEYCLOAK_CLIENT_ID = "kalugin"
 KEYCLOAK_REALM = "notes_service_realm"
-KEYCLOAK_CLIENT_SECRET = "pp2HNzhMUxP0q1r627Kun5TbwWEjNW60"
+KEYCLOAK_CLIENT_SECRET = "n7ez8h0rsfZ67XWsGpDPl6nlbyBDVv7J"
 
 keycloak_openid = KeycloakOpenID(server_url=KEYCLOAK_URL,
                                  client_id=KEYCLOAK_CLIENT_ID,
@@ -58,20 +58,15 @@ async def get_token(username: str = Form(...), password: str = Form(...)):
         token = keycloak_openid.token(grant_type=["password"],
                                       username=username,
                                       password=password)
-        global user_token
-        user_token = token
         return token
     except Exception as e:
         print(e)  # Логирование для диагностики
         raise HTTPException(status_code=400, detail="Не удалось получить токен")
 
 
-def check_user_roles():
-    global user_token
-    token = user_token
+def check_user_roles(token):
     try:
-        #userinfo = keycloak_openid.userinfo(token["access_token"])
-        token_info = keycloak_openid.introspect(token["access_token"])
+        token_info = keycloak_openid.introspect(token)
         if "testRole" not in token_info["realm_access"]["roles"]:
             raise HTTPException(status_code=403, detail="Access denied")
         return token_info
@@ -85,6 +80,8 @@ class Note(BaseModel):
     title: str
     content: str
 
+    class Config:
+        orm_mode = True
 
 # Функция для получения сессии базы данных
 def get_db():
@@ -104,8 +101,8 @@ def process_data(data):
 
 # Маршрут для создания записи
 @app.post("/notes/", response_model=Note)
-async def create_note(note: Note, db: Session = Depends(get_db)):
-    if check_user_roles():
+async def create_note(note: Note, db: Session = Depends(get_db), token: str = Header(...)):
+    if check_user_roles(token):
         # Вызов вложенной функции для обработки данных
         processed_content = process_data(note.content)
         db_note = NoteDB(title=note.title, content=processed_content)
@@ -119,8 +116,8 @@ async def create_note(note: Note, db: Session = Depends(get_db)):
 
 # Маршрут для чтения всех записей
 @app.get("/notes/", response_model=List[Note])
-async def read_notes(db: Session = Depends(get_db)):
-    if check_user_roles():
+async def read_notes(db: Session = Depends(get_db), token: str = Header(...)):
+    if check_user_roles(token):
         return db.query(NoteDB).all()
 
 
@@ -135,8 +132,8 @@ async def read_note(note_id: int, db: Session = Depends(get_db)):
 
 # Маршрут для удаления записи
 @app.delete("/notes/{note_id}")
-async def delete_note(note_id: int, db: Session = Depends(get_db)):
-    if check_user_roles():
+async def delete_note(note_id: int, db: Session = Depends(get_db), token: str = Header(...)):
+    if check_user_roles(token):
         note = db.query(NoteDB).filter(NoteDB.id == note_id).first()
         if note is None:
             raise HTTPException(status_code=404, detail="Note not found")
